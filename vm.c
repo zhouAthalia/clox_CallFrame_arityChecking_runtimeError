@@ -62,46 +62,7 @@ static bool lenNative(int argCount, Value* args) {
   return true; 
 }
 
-//ch24 q4
-static bool typeNative(int argCount, Value* args) {
-  (void)argCount;
-  const char* name;
-  if (IS_NIL(args[0])) name = "nil"; 
-  else if (IS_BOOL(args[0])) name = "boolean";
-  else if (IS_NUMBER(args[0])) name = "number";
-  else if (IS_STRING(args[0])) name = "string";
-  else if (IS_FUNCTION(args[0])) name = "function"; 
-  else if (IS_NATIVE(args[0])) name = "native"; 
-  else return nativeError(args, "type(): unknown value."); 
-  args[-1] = OBJ_VAL(copyString(name, (int)strlen(name)));
-  return true; 
-}
 
-//ch24 q4
-static bool parseNative(int argCount, Value* args) {
-  (void)argCount;
-  if (!IS_STRING(args[0])) return nativeError(args, "parse() expects a string."); 
-  char* end;
-  double value = strtod(AS_CSTRING(args[0]), &end); 
-  bool ok = end != AS_CSTRING(args[0]) && *end == '\0'; 
-  args[-1] = ok ? NUMBER_VAL(value) : NIL_VAL; 
-  return true; 
-}
-
-//ch24 q4
-static bool inputNative(int argCount, Value* args) {
-  (void)argCount;
-  (void)args;
-  char line[1024]; 
-  if (fgets(line, sizeof(line), stdin) == NULL) { 
-    args[-1] = NIL_VAL; 
-    return true; 
-  }
-  int length = (int)strlen(line); 
-  if (length > 0 && line[length - 1] == '\n') length--; 
-  args[-1] = OBJ_VAL(copyString(line, length)); 
-  return true; 
-}
 
 static void defineNative(const char* name, NativeFn function, int arity) {
   push(OBJ_VAL(copyString(name, (int)strlen(name))));
@@ -124,9 +85,6 @@ void initVM(void) {
   //ch24 q4
   defineNative("abs", absNative, 1); 
   defineNative("len", lenNative, 1); 
-  defineNative("type", typeNative, 1);
-  defineNative("input", inputNative, 0); 
-  defineNative("parse", parseNative, 1); 
 }
 
 void freeVM(void) {
